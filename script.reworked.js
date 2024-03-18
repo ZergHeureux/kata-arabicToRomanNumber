@@ -32,7 +32,8 @@ class ArabicNumber{
             fifth: 'MM',
         }
     }
-    exeptionCases = null
+    exeptionCases = null;
+
     arabicNumber = 0;
     powerOfTen = 0;
     romanString = "";
@@ -48,6 +49,9 @@ class ArabicNumber{
         this.setExceptionCases()
     }
 
+    /**
+     * Construct exeption Cases in patterns
+     */
     setExceptionCases(){
         this.exeptionCases = {
             4: { exeption: this.patterns[this.powerOfTen].unit + this.patterns[this.powerOfTen].fifth },
@@ -114,6 +118,14 @@ const createArabicNumberArray = (arabicNumber) => {
     return revertedNumberStringArray;
 }
 
+const mergeListIntoString = (stringList) => {
+    var composedString = ''
+    stringList.forEach(num => {
+        composedString += num
+    })
+    return composedString
+}
+
 /**
  * 
  * @param {Number} arabicNumber 
@@ -131,18 +143,12 @@ const convertToRomansNumbers = (arabicNumber) => {
     // We reversed numbers for better treatment, so lets get back in correct reading 
     romanNumbers = romanNumbers.reverse()
     const romanNumberString = mergeListIntoString(romanNumbers)
-    // console.log(res)
+    
     return romanNumberString;
 
 }
 
-const mergeListIntoString = (stringList) => {
-    var composedString = ''
-    stringList.forEach(num => {
-        composedString += num
-    })
-    return composedString
-}
+
 
 
 
