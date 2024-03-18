@@ -1,5 +1,3 @@
-
-
 /*
 *   Precedent execution was to substract from arabic and identify roman values (1000,100,50, ...)
 *   Precising particular cases at each step
@@ -11,75 +9,131 @@
 *   This is the first case : using Arrays and patterns 
 */
 
-const revertedArabicNumberInList = (arabicNumberList) => {
-    var numberString = arabicNumberList.toString()
-    var numberStringList = numberString.split('')
-    var revertedNumberStringList = numberStringList.reverse()
-    return revertedNumberStringList;
+class ArabicNumber{
+    patterns = {
+        0: {
+            unit: 'I',
+            limit: 'X',
+            fifth: 'V',
+        },
+        1: {
+            unit: 'X',
+            limit: 'C',
+            fifth: 'L',
+        },
+        2: {
+            unit: 'C',
+            limit: 'M',
+            fifth: 'D',
+        },
+        3: {
+            unit: 'M',
+            limit: 'MMM',
+            fifth: 'MM',
+        }
+    }
+    exeptionCases = null
+    arabicNumber = 0;
+    powerOfTen = 0;
+    romanString = "";
+
+    /**
+     * 
+     * @param {Number} arabicValue 
+     * @param {Number} powerOfTen 
+     */
+    constructor(arabicValue, powerOfTen){
+        this.arabicNumber = arabicValue;
+        this.powerOfTen = powerOfTen;
+        this.setExceptionCases()
+    }
+
+    setExceptionCases(){
+        this.exeptionCases = {
+            4: { exeption: this.patterns[this.powerOfTen].unit + this.patterns[this.powerOfTen].fifth },
+            9: { exeption: this.patterns[this.powerOfTen].unit + this.patterns[this.powerOfTen].limit }
+        }
+    }
+    /**
+     * 
+     * @returns {String} Roman translation of Arabic Number
+     */
+    getRomanTranslation(){
+        this.romanString = this.#translateString(this.arabicNumber);
+        return this.romanString
+    }
+
+    /**
+     * 
+     * @returns {String} Translated string
+     */
+    #translateString(){
+        return this.#getCorrespondingRomanValue()
+    }
+   
+    /**
+     * 
+     * @returns {String} Translated string into roman numeric alphabet
+     */
+    #getCorrespondingRomanValue(){
+        return this.#identifyRomanTranslation(this.arabicNumber);
+    }
+
+    /**
+     * 
+     * @param {Number} value Arabic value
+     * @returns {String} Roman value corresponding to arabic value
+     */
+    #identifyRomanTranslation(){
+        var correctRomanValue = "";
+        for (let potentialArabicValue = 1; potentialArabicValue <= this.arabicNumber; potentialArabicValue++) {
+            if (potentialArabicValue == 4) {correctRomanValue = this.exeptionCases[4].exeption}
+            else if (potentialArabicValue == 5) {correctRomanValue = this.patterns[this.powerOfTen].fifth}
+            else if (potentialArabicValue == 9) {correctRomanValue = this.exeptionCases[9].exeption}
+            else{ correctRomanValue +=  this.patterns[this.powerOfTen].unit;}
+            console.log(this.arabicNumber,correctRomanValue)
+        }
+        return correctRomanValue
+    }
+
+}
+/**
+ * 
+ * @param {Number[]} arabicNumberList 
+ * @returns {String[]}
+ */
+const createArabicNumberArray = (arabicNumber) => {
+    var numberString = arabicNumber.toString()
+    var numberStringArray = numberString.split('')
+    var revertedNumberStringArray = numberStringArray.reverse()
+    
+    revertedNumberStringArray.forEach((numberAsString,powerOfTen) =>{
+        numberStringArray[powerOfTen] = new ArabicNumber(parseInt(numberAsString),powerOfTen)
+    })
+    
+    return revertedNumberStringArray;
 }
 
 /**
  * 
  * @param {Number} arabicNumber 
+ * @returns {String}
  */
 const convertToRomansNumbers = (arabicNumber) => {
-    const arabicNumberList = revertedArabicNumberInList(arabicNumber) //TODO reverse func
-    // console.log("list " + arabicNumberList)
-    var romanNumberList = []
+    const arabicNumberArray = createArabicNumberArray(arabicNumber)
+    // console.log("list " + arabicNumberArray)
+    var romanNumbers = []
 
-    arabicNumberList.forEach((value, powerOfTen) => {
-        romanNumberList.push(getRomanTranslationFromPowerOfTen(parseInt(value), powerOfTen))
-    })
+    arabicNumberArray.forEach(arabicNumberObject => {
+        romanNumbers.push(arabicNumberObject.getRomanTranslation());
+    });
 
     // We reversed numbers for better treatment, so lets get back in correct reading 
-    romanNumberList = romanNumberList.reverse()
-    const romanNumberString = mergeListIntoString(romanNumberList)
+    romanNumbers = romanNumbers.reverse()
+    const romanNumberString = mergeListIntoString(romanNumbers)
     // console.log(res)
     return romanNumberString;
 
-}
-// We can identify patterns in tens 
-const getRomanTranslationFromPowerOfTen = (value, powerOfTen) => {
-    const patterns = {
-        0: {
-            base: 'I',
-            middle: 'V',
-            last: 'X'
-        },
-        1: {
-            base: 'X',
-            middle: 'L',
-            last: 'C'
-        },
-        2: {
-            base: 'C',
-            middle: 'D',
-            last: 'M'
-        },
-        3: {
-            base: 'M',
-            middle: 'MM',
-            last: 'MMM'
-        }
-    }
-    // We can identify in substractive roman numbers two unique cases differing from patterns 
-    const uniqueCases = {
-        4: { exeption: patterns[powerOfTen].base + patterns[powerOfTen].middle },
-        9: { exeption: patterns[powerOfTen].base + patterns[powerOfTen].last }
-    }
-
-    var romanString = ''
-
-    //Construct this bit of value with patterns
-    for (let i = 1; i <= value; i++) {
-        romanString += patterns[powerOfTen].base
-        if (Object.keys(uniqueCases).includes(i.toString())) {
-            romanString = uniqueCases[i].exeption;
-        }
-        if (i == 5) romanString = patterns[powerOfTen].middle
-    }
-
-    return romanString;
 }
 
 const mergeListIntoString = (stringList) => {
